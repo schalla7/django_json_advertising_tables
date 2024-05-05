@@ -18,6 +18,8 @@ class Command(BaseCommand):
             'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/58.0.3029.110 Safari/537.3'
         }
 
+        counts = {}
+        additions = False
         for platform, url in urls.items():
             print(f"Pulling latest sellers data from [{platform}]")
             response = requests.get(url, headers=headers)
@@ -32,11 +34,30 @@ class Command(BaseCommand):
                 continue
 
             for entry in data:
-                if not Seller.objects.filter(domain=entry['domain'], ad_platform=platform).exists():
-                    Seller.objects.create(
-                        seller_id=entry['seller_id'],
-                        name=entry['name'],
-                        domain=entry['domain'],
-                        seller_type=entry['seller_type'],
-                        ad_platform=platform
-                    )
+                # Check all required fields are not only present but also non-empty
+                if all(entry.get(key) for key in ['seller_id', 'name', 'domain', 'seller_type']):
+                    if not Seller.objects.filter(domain=entry['domain'], ad_platform=platform).exists():
+                        Seller.objects.create(
+                            seller_id=entry['seller_id'],
+                            name=entry['name'],
+                            domain=entry['domain'],
+                            seller_type=entry['seller_type'],
+                            ad_platform=platform
+                        )
+                        if platform not in counts:
+                            counts[platform] = 1
+                        else:
+                            counts[platform] += 1
+                        additions = True
+                        if "total" not in counts:
+                            counts["total"] = 1
+                        else:
+                            counts["total"] += 1
+                else:
+                    self.stderr.write(f"Missing or empty required data in entry from {url}: {entry}")
+
+        
+        if additions:
+            print("\nSome new sellers were found/added since the last run:")
+            for platform in counts:
+                print(f"\t{platform}: {counts[platform]}")
