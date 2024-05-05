@@ -3,30 +3,41 @@
 {% block title %}Seller List{% endblock %}
 
 {% block content %}
-<table>
-    <thead>
-        <tr>
-            <th>#</th>
-            <!-- <th>Seller ID</th> -->
-            <th>Name</th>
-            <th>Domain</th>
-            <th>Seller Type</th>
-            <th>Date First Added</th>
-            <th>Ad Platform</th>
-        </tr>
-    </thead>
-    <tbody>
-        {% for seller in sellers %}
-        <tr>
-            <td>{{ forloop.counter }}</td>
-            <!-- <td>{{ seller.seller_id }}</td> -->
-            <td>{{ seller.name }}</td>
-            <td>{{ seller.domain }}</td>
-            <td>{{ seller.seller_type }}</td>
-            <td>{{ seller.date_first_added }}</td>
-            <td>{{ seller.ad_platform }}</td>
-        </tr>
-        {% endfor %}
-    </tbody>
-</table>
+<form method="get" action="">
+    <input type="text" name="q" placeholder="Search..." value="{{ query }}">
+    <button type="submit">Search</button>
+</form>
+
+{% if sellers %}
+    <table>
+        <thead>
+            <tr>
+                <th class="counter">#</th>
+                <!-- <th><a href="?sort=seller_id&order={% if sort_by == 'seller_id' and order == 'asc' %}desc{% else %}asc{% endif %}">Seller ID</a></th> -->
+                <th><a href="?sort=name&order={% if sort_by == 'name' and order == 'asc' %}desc{% else %}asc{% endif %}">Name</a></th>
+                <th><a href="?sort=domain&order={% if sort_by == 'domain' and order == 'asc' %}desc{% else %}asc{% endif %}">Domain</a></th>
+                <th><a href="?sort=seller_type&order={% if sort_by == 'seller_type' and order == 'asc' %}desc{% else %}asc{% endif %}">Seller Type</a></th>
+                <th><a href="?sort=date_first_added&order={% if sort_by == 'date_first_added' and order == 'asc' %}desc{% else %}asc{% endif %}">Date First Added</a></th>
+                <th><a href="?sort=ad_platform&order={% if sort_by == 'ad_platform' and order == 'asc' %}desc{% else %}asc{% endif %}">Ad Platform</a></th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for seller in sellers %}
+            <tr>
+                <td>{{ forloop.counter }}</td>
+                <!-- <td>{{ seller.seller_id }}</td> -->
+                <td>{{ seller.name }}</td>
+                <td>{{ seller.domain }}</td>
+                <td>{{ seller.seller_type }}</td>
+                <td>{{ seller.date_first_added }}</td>
+                <td>{{ seller.ad_platform }}</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+{% else %}
+    <p>No sellers found.</p>
+{% endif %}
+
+
 {% endblock %}
